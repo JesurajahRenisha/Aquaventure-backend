@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.aquaventure.entity.User;
 import com.example.aquaventure.service.AuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -18,7 +20,7 @@ public class AuthController {
     private AuthService service;
 
     @PostMapping("/register")
-    public String register(@RequestBody User user){
+    public String register(@Valid @RequestBody User user){
         return service.register(user);
     }
 
