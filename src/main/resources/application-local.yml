@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aquaventure_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:Postgres@123}
+  jpa:
+    show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET:local_dev_only_secret_change_me_32bytes_min}
+
+admin:
+  setup-key: ${ADMIN_SETUP_KEY:local_dev_only_admin_setup_key}

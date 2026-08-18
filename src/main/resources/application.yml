@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: aquaventure
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # Lets Flyway adopt a database that already has tables (e.g. the legacy
+    # users/customer tables from before this schema existed) instead of
+    # refusing to run. Has no effect on a genuinely empty database.
+    baseline-on-migrate: true
+    baseline-version: 0
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+admin:
+  # Shared secret required to create an admin account via the API, since
+  # admin accounts have no self-registration and there is no admin-only
+  # authenticated route (yet) to gate this behind instead.
+  setup-key: ${ADMIN_SETUP_KEY}
+
+weather:
+  cache-ttl-minutes: ${WEATHER_CACHE_TTL_MINUTES:60}
+  api:
+    marine-base-url: ${WEATHER_MARINE_API_URL:https://marine-api.open-meteo.com/v1/marine}
+    forecast-base-url: ${WEATHER_FORECAST_API_URL:https://api.open-meteo.com/v1/forecast}
+    # Open-Meteo is free and keyless; this is unused by the current client but
+    # kept so a paid provider can be swapped in without changing config shape.
+    key: ${WEATHER_API_KEY:}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

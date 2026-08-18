@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aquaventure_test_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:Postgres@123}
+  jpa:
+    show-sql: false
+
+jwt:
+  secret: test_only_secret_key_never_used_outside_tests_32bytes
