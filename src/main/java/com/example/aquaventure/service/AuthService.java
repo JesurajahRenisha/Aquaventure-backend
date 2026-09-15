@@ -26,13 +26,13 @@ public class AuthService {
         // Additional business logic validations
         validateRegistrationData(user);
 
+        // Sanitize input data
+        sanitizeUserData(user);
+
         // Check if email already exists
         if (repo.findByEmail(user.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
-
-        // Sanitize input data
-        sanitizeUserData(user);
 
         // Encode password
         user.setPassword(encoder.encode(user.getPassword()));
