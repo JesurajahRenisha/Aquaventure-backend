@@ -1,0 +1,13 @@
+package com.example.aquaventure.entity;
+
+public enum NotificationType {
+    SCHOOL_APPROVED,
+    SCHOOL_REJECTED,
+    SCHOOL_SUSPENDED,
+    SCHOOL_REACTIVATED,
+    BOOKING_CREATED,
+    BOOKING_ACCEPTED,
+    BOOKING_REJECTED,
+    BOOKING_CANCELLED,
+    BOOKING_COMPLETED
+}
