@@ -1,0 +1,550 @@
+{
+  "info": {
+    "name": "AquaVenture API",
+    "description": "Surf tourist / surf school platform API. Base URL defaults to http://localhost:8080/api. Login requests auto-save their token into the matching collection variable via a test script.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "surferToken", "value": "" },
+    { "key": "schoolAdminToken", "value": "" },
+    { "key": "platformAdminToken", "value": "" },
+    { "key": "locationId", "value": "1" },
+    { "key": "schoolId", "value": "1" },
+    { "key": "instructorId", "value": "1" },
+    { "key": "lessonId", "value": "1" },
+    { "key": "lessonSlotId", "value": "1" },
+    { "key": "equipmentId", "value": "1" },
+    { "key": "bookingId", "value": "1" },
+    { "key": "progressEntryId", "value": "1" },
+    { "key": "notificationId", "value": "1" },
+    { "key": "userId", "value": "1" },
+    { "key": "documentIndex", "value": "0" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Surfer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"Nimal\",\n  \"lastname\": \"Silva\",\n  \"email\": \"nimal.surf@example.com\",\n  \"password\": \"Password1!\",\n  \"phone\": \"0771234567\",\n  \"nationality\": \"Sri Lanka\",\n  \"local\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/surfer", "host": ["{{baseUrl}}"], "path": ["auth", "register", "surfer"] }
+          }
+        },
+        {
+          "name": "Register School (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "ownerFirstname", "value": "Kasun", "type": "text" },
+                { "key": "ownerLastname", "value": "Perera", "type": "text" },
+                { "key": "email", "value": "kasun.school@example.com", "type": "text" },
+                { "key": "password", "value": "Password1!", "type": "text" },
+                { "key": "schoolName", "value": "Arugam Surf Co", "type": "text" },
+                { "key": "description", "value": "Friendly beginner-focused surf school", "type": "text" },
+                { "key": "address", "value": "Main Street, Arugam Bay", "type": "text" },
+                { "key": "contactPhone", "value": "0771112222", "type": "text" },
+                { "key": "contactEmail", "value": "info@arugamsurf.com", "type": "text" },
+                { "key": "businessRegistrationNumber", "value": "BRN-001", "type": "text" },
+                { "key": "locationIds", "value": "1", "type": "text" },
+                { "key": "documents", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register/school", "host": ["{{baseUrl}}"], "path": ["auth", "register", "school"] }
+          }
+        },
+        {
+          "name": "Login as Surfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.token) { pm.collectionVariables.set('surferToken', body.data.token); }"], "type": "text/javascript" }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"nimal.surf@example.com\",\n  \"password\": \"Password1!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login as School Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.token) { pm.collectionVariables.set('schoolAdminToken', body.data.token); }", "if (body.data && body.data.schoolId) { pm.collectionVariables.set('schoolId', body.data.schoolId); }"], "type": "text/javascript" }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"kasun.school@example.com\",\n  \"password\": \"Password1!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login as Platform Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.token) { pm.collectionVariables.set('platformAdminToken', body.data.token); }"], "type": "text/javascript" }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@aquaventure.dev\",\n  \"password\": \"Admin@12345\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public - Discovery & Conditions",
+      "item": [
+        {
+          "name": "List Locations",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/locations", "host": ["{{baseUrl}}"], "path": ["locations"] } }
+        },
+        {
+          "name": "Get Surf Conditions",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/locations/{{locationId}}/conditions", "host": ["{{baseUrl}}"], "path": ["locations", "{{locationId}}", "conditions"] } }
+        },
+        {
+          "name": "Search Schools",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/schools?locationId={{locationId}}&skillLevel=BEGINNER&lessonType=GROUP&minPrice=0&maxPrice=100&sort=name&page=0&size=20",
+              "host": ["{{baseUrl}}"], "path": ["schools"],
+              "query": [
+                { "key": "locationId", "value": "{{locationId}}" },
+                { "key": "skillLevel", "value": "BEGINNER" },
+                { "key": "lessonType", "value": "GROUP" },
+                { "key": "minPrice", "value": "0" },
+                { "key": "maxPrice", "value": "100" },
+                { "key": "sort", "value": "name" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get School Detail",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/schools/{{schoolId}}", "host": ["{{baseUrl}}"], "path": ["schools", "{{schoolId}}"] } }
+        },
+        {
+          "name": "Compare Schools",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/schools/compare?ids=1,2",
+              "host": ["{{baseUrl}}"], "path": ["schools", "compare"],
+              "query": [{ "key": "ids", "value": "1,2" }]
+            }
+          }
+        },
+        {
+          "name": "Get Lesson Open Slots",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{lessonId}}/slots?from=2026-11-01T00:00:00Z&to=2026-12-01T00:00:00Z",
+              "host": ["{{baseUrl}}"], "path": ["lessons", "{{lessonId}}", "slots"],
+              "query": [
+                { "key": "from", "value": "2026-11-01T00:00:00Z" },
+                { "key": "to", "value": "2026-12-01T00:00:00Z" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surfer",
+      "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{surferToken}}" }] },
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/surfer/me/profile", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "profile"] } }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"skillLevel\": \"BEGINNER\",\n  \"preferredLocationId\": {{locationId}},\n  \"preferredLessonType\": \"GROUP\",\n  \"budgetMin\": 20,\n  \"budgetMax\": 80,\n  \"boardTypePreference\": \"Softboard\",\n  \"bio\": \"New to surfing, excited to learn!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/surfer/me/profile", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "profile"] }
+          }
+        },
+        {
+          "name": "Get Recommendations",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/surfer/me/recommendations", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "recommendations"] } }
+        },
+        {
+          "name": "Create Booking",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) { pm.collectionVariables.set('bookingId', body.data.id); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"lessonSlotId\": {{lessonSlotId}},\n  \"participants\": 2,\n  \"equipmentItems\": [\n    { \"equipmentId\": {{equipmentId}}, \"quantity\": 1, \"rentalUnit\": \"HOUR\" }\n  ],\n  \"note\": \"First time surfing!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/bookings", "host": ["{{baseUrl}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "List My Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/surfer/me/bookings?status=PENDING",
+              "host": ["{{baseUrl}}"], "path": ["surfer", "me", "bookings"],
+              "query": [{ "key": "status", "value": "PENDING", "disabled": false }]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/surfer/me/bookings/{{bookingId}}/cancel", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "bookings", "{{bookingId}}", "cancel"] } }
+        },
+        {
+          "name": "List My Progress Entries",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/surfer/me/progress", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "progress"] } }
+        },
+        {
+          "name": "Create Progress Entry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date\": \"2026-11-10T09:00:00Z\",\n  \"locationId\": {{locationId}},\n  \"skillFocus\": \"Pop-up and balance\",\n  \"durationMinutes\": 90,\n  \"selfRating\": 3,\n  \"notes\": \"Stood up twice!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/surfer/me/progress", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "progress"] }
+          }
+        },
+        {
+          "name": "Update Progress Entry (fill in a draft)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date\": \"2026-11-10T09:00:00Z\",\n  \"locationId\": {{locationId}},\n  \"skillFocus\": \"Pop-up and balance\",\n  \"durationMinutes\": 90,\n  \"selfRating\": 4,\n  \"notes\": \"Caught my first wave!\"\n}" },
+            "url": { "raw": "{{baseUrl}}/surfer/me/progress/{{progressEntryId}}", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "progress", "{{progressEntryId}}"] }
+          }
+        },
+        {
+          "name": "Delete Progress Entry",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/surfer/me/progress/{{progressEntryId}}", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "progress", "{{progressEntryId}}"] } }
+        },
+        {
+          "name": "Get Progress Summary",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/surfer/me/progress/summary", "host": ["{{baseUrl}}"], "path": ["surfer", "me", "progress", "summary"] } }
+        }
+      ]
+    },
+    {
+      "name": "School Admin - Profile & Resources",
+      "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{schoolAdminToken}}" }] },
+      "item": [
+        {
+          "name": "Get My School Profile",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me", "host": ["{{baseUrl}}"], "path": ["school", "me"] } }
+        },
+        {
+          "name": "Update My School Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Arugam Surf Co\",\n  \"description\": \"Friendly beginner-focused surf school\",\n  \"address\": \"Main Street, Arugam Bay\",\n  \"contactPhone\": \"0771112222\",\n  \"contactEmail\": \"info@arugamsurf.com\",\n  \"logoUrl\": \"https://example.com/logo.png\",\n  \"imageUrls\": [\"https://example.com/photo1.jpg\"],\n  \"locationIds\": [{{locationId}}]\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me", "host": ["{{baseUrl}}"], "path": ["school", "me"] }
+          }
+        },
+        {
+          "name": "Get Verification Document",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/schools/{{schoolId}}/documents/{{documentIndex}}", "host": ["{{baseUrl}}"], "path": ["schools", "{{schoolId}}", "documents", "{{documentIndex}}"] } }
+        },
+        {
+          "name": "List My Instructors",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me/instructors", "host": ["{{baseUrl}}"], "path": ["school", "me", "instructors"] } }
+        },
+        {
+          "name": "Create Instructor",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) { pm.collectionVariables.set('instructorId', body.data.id); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sunil Perera\",\n  \"bio\": \"10 years teaching\",\n  \"experienceYears\": 10,\n  \"certifications\": [\"ISA Level 2\"],\n  \"languages\": [\"English\", \"Sinhala\"],\n  \"skillLevelsTaught\": [\"BEGINNER\", \"INTERMEDIATE\"],\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/instructors", "host": ["{{baseUrl}}"], "path": ["school", "me", "instructors"] }
+          }
+        },
+        {
+          "name": "Update Instructor",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sunil Perera\",\n  \"bio\": \"10 years teaching, ISA certified\",\n  \"experienceYears\": 11,\n  \"certifications\": [\"ISA Level 2\"],\n  \"languages\": [\"English\", \"Sinhala\"],\n  \"skillLevelsTaught\": [\"BEGINNER\", \"INTERMEDIATE\"],\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/instructors/{{instructorId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "instructors", "{{instructorId}}"] }
+          }
+        },
+        {
+          "name": "Delete Instructor",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/school/me/instructors/{{instructorId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "instructors", "{{instructorId}}"] } }
+        },
+        {
+          "name": "List My Lessons",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me/lessons", "host": ["{{baseUrl}}"], "path": ["school", "me", "lessons"] } }
+        },
+        {
+          "name": "Create Lesson",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) { pm.collectionVariables.set('lessonId', body.data.id); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Beginner Group Surf\",\n  \"description\": \"A fun introduction to surfing\",\n  \"lessonType\": \"GROUP\",\n  \"skillLevel\": \"BEGINNER\",\n  \"durationMinutes\": 90,\n  \"price\": 45.00,\n  \"currency\": \"USD\",\n  \"maxParticipants\": 6,\n  \"includesEquipment\": false,\n  \"locationId\": {{locationId}},\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/lessons", "host": ["{{baseUrl}}"], "path": ["school", "me", "lessons"] }
+          }
+        },
+        {
+          "name": "Update Lesson",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Beginner Group Surf\",\n  \"description\": \"A fun introduction to surfing, now with video review\",\n  \"lessonType\": \"GROUP\",\n  \"skillLevel\": \"BEGINNER\",\n  \"durationMinutes\": 90,\n  \"price\": 50.00,\n  \"currency\": \"USD\",\n  \"maxParticipants\": 6,\n  \"includesEquipment\": true,\n  \"locationId\": {{locationId}},\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/lessons/{{lessonId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "lessons", "{{lessonId}}"] }
+          }
+        },
+        {
+          "name": "Delete Lesson",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/school/me/lessons/{{lessonId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "lessons", "{{lessonId}}"] } }
+        },
+        {
+          "name": "List My Slots",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me/slots", "host": ["{{baseUrl}}"], "path": ["school", "me", "slots"] } }
+        },
+        {
+          "name": "Create Slot",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) { pm.collectionVariables.set('lessonSlotId', body.data.id); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"lessonId\": {{lessonId}},\n  \"instructorId\": {{instructorId}},\n  \"locationId\": {{locationId}},\n  \"startTime\": \"2026-11-10T09:00:00Z\",\n  \"endTime\": \"2026-11-10T10:30:00Z\",\n  \"capacity\": 5\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/slots", "host": ["{{baseUrl}}"], "path": ["school", "me", "slots"] }
+          }
+        },
+        {
+          "name": "Update Slot",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"lessonId\": {{lessonId}},\n  \"instructorId\": {{instructorId}},\n  \"locationId\": {{locationId}},\n  \"startTime\": \"2026-11-10T09:00:00Z\",\n  \"endTime\": \"2026-11-10T11:00:00Z\",\n  \"capacity\": 6\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/slots/{{lessonSlotId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "slots", "{{lessonSlotId}}"] }
+          }
+        },
+        {
+          "name": "Delete Slot",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/school/me/slots/{{lessonSlotId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "slots", "{{lessonSlotId}}"] } }
+        },
+        {
+          "name": "List My Equipment",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me/equipment", "host": ["{{baseUrl}}"], "path": ["school", "me", "equipment"] } }
+        },
+        {
+          "name": "Create Equipment",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.data && body.data.id) { pm.collectionVariables.set('equipmentId', body.data.id); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"SURFBOARD\",\n  \"name\": \"Soft Top 8ft\",\n  \"size\": \"8ft\",\n  \"totalQuantity\": 5,\n  \"rentalPricePerHour\": 5.00,\n  \"rentalPricePerDay\": 20.00,\n  \"available\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/equipment", "host": ["{{baseUrl}}"], "path": ["school", "me", "equipment"] }
+          }
+        },
+        {
+          "name": "Update Equipment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"SURFBOARD\",\n  \"name\": \"Soft Top 8ft\",\n  \"size\": \"8ft\",\n  \"totalQuantity\": 8,\n  \"rentalPricePerHour\": 6.00,\n  \"rentalPricePerDay\": 25.00,\n  \"available\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/equipment/{{equipmentId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "equipment", "{{equipmentId}}"] }
+          }
+        },
+        {
+          "name": "Delete Equipment",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/school/me/equipment/{{equipmentId}}", "host": ["{{baseUrl}}"], "path": ["school", "me", "equipment", "{{equipmentId}}"] } }
+        }
+      ]
+    },
+    {
+      "name": "School Admin - Bookings & Dashboard",
+      "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{schoolAdminToken}}" }] },
+      "item": [
+        {
+          "name": "List My School's Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/school/me/bookings?status=PENDING",
+              "host": ["{{baseUrl}}"], "path": ["school", "me", "bookings"],
+              "query": [{ "key": "status", "value": "PENDING" }]
+            }
+          }
+        },
+        {
+          "name": "Accept Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/school/me/bookings/{{bookingId}}/accept", "host": ["{{baseUrl}}"], "path": ["school", "me", "bookings", "{{bookingId}}", "accept"] } }
+        },
+        {
+          "name": "Reject Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"note\": \"No instructor available at that time\"\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/bookings/{{bookingId}}/reject", "host": ["{{baseUrl}}"], "path": ["school", "me", "bookings", "{{bookingId}}", "reject"] }
+          }
+        },
+        {
+          "name": "Complete Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/school/me/bookings/{{bookingId}}/complete", "host": ["{{baseUrl}}"], "path": ["school", "me", "bookings", "{{bookingId}}", "complete"] } }
+        },
+        {
+          "name": "Add Instructor Feedback to Progress Entry",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"feedback\": \"Great improvement on pop-ups, keep practicing balance.\"\n}" },
+            "url": { "raw": "{{baseUrl}}/school/me/progress/{{progressEntryId}}/feedback", "host": ["{{baseUrl}}"], "path": ["school", "me", "progress", "{{progressEntryId}}", "feedback"] }
+          }
+        },
+        {
+          "name": "Get My School Dashboard",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/school/me/dashboard", "host": ["{{baseUrl}}"], "path": ["school", "me", "dashboard"] } }
+        }
+      ]
+    },
+    {
+      "name": "Platform Admin",
+      "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{platformAdminToken}}" }] },
+      "item": [
+        {
+          "name": "List Schools",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/schools?status=PENDING",
+              "host": ["{{baseUrl}}"], "path": ["admin", "schools"],
+              "query": [{ "key": "status", "value": "PENDING" }]
+            }
+          }
+        },
+        {
+          "name": "Get School Detail (admin)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/admin/schools/{{schoolId}}", "host": ["{{baseUrl}}"], "path": ["admin", "schools", "{{schoolId}}"] } }
+        },
+        {
+          "name": "Approve School",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/admin/schools/{{schoolId}}/approve", "host": ["{{baseUrl}}"], "path": ["admin", "schools", "{{schoolId}}", "approve"] } }
+        },
+        {
+          "name": "Reject School",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"Missing business registration documents\"\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/schools/{{schoolId}}/reject", "host": ["{{baseUrl}}"], "path": ["admin", "schools", "{{schoolId}}", "reject"] }
+          }
+        },
+        {
+          "name": "Suspend School",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/admin/schools/{{schoolId}}/suspend", "host": ["{{baseUrl}}"], "path": ["admin", "schools", "{{schoolId}}", "suspend"] } }
+        },
+        {
+          "name": "Reactivate School",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/admin/schools/{{schoolId}}/reactivate", "host": ["{{baseUrl}}"], "path": ["admin", "schools", "{{schoolId}}", "reactivate"] } }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?role=SURFER&q=nimal",
+              "host": ["{{baseUrl}}"], "path": ["admin", "users"],
+              "query": [{ "key": "role", "value": "SURFER" }, { "key": "q", "value": "nimal" }]
+            }
+          }
+        },
+        {
+          "name": "Suspend User",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/admin/users/{{userId}}/suspend", "host": ["{{baseUrl}}"], "path": ["admin", "users", "{{userId}}", "suspend"] } }
+        },
+        {
+          "name": "Reactivate User",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/admin/users/{{userId}}/reactivate", "host": ["{{baseUrl}}"], "path": ["admin", "users", "{{userId}}", "reactivate"] } }
+        },
+        {
+          "name": "List Locations (admin, incl. inactive)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/admin/locations", "host": ["{{baseUrl}}"], "path": ["admin", "locations"] } }
+        },
+        {
+          "name": "Create Location",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Okanda\",\n  \"region\": \"Eastern Province\",\n  \"description\": \"Remote, exposed beach break for experienced surfers\",\n  \"latitude\": 6.6056,\n  \"longitude\": 81.7962,\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/locations", "host": ["{{baseUrl}}"], "path": ["admin", "locations"] }
+          }
+        },
+        {
+          "name": "Update Location",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Okanda\",\n  \"region\": \"Eastern Province\",\n  \"description\": \"Updated description\",\n  \"latitude\": 6.6056,\n  \"longitude\": 81.7962,\n  \"active\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/admin/locations/{{locationId}}", "host": ["{{baseUrl}}"], "path": ["admin", "locations", "{{locationId}}"] }
+          }
+        },
+        {
+          "name": "Delete (deactivate) Location",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/admin/locations/{{locationId}}", "host": ["{{baseUrl}}"], "path": ["admin", "locations", "{{locationId}}"] } }
+        },
+        {
+          "name": "Get Platform Stats",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/admin/stats", "host": ["{{baseUrl}}"], "path": ["admin", "stats"] } }
+        }
+      ]
+    },
+    {
+      "name": "Notifications (Any Role)",
+      "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{surferToken}}" }] },
+      "item": [
+        {
+          "name": "List My Notifications",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/notifications/me", "host": ["{{baseUrl}}"], "path": ["notifications", "me"] } }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/notifications/{{notificationId}}/read", "host": ["{{baseUrl}}"], "path": ["notifications", "{{notificationId}}", "read"] } }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/notifications/me/read-all", "host": ["{{baseUrl}}"], "path": ["notifications", "me", "read-all"] } }
+        }
+      ]
+    }
+  ]
+}
